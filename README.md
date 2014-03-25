@@ -1,6 +1,8 @@
 # dag-runner
 
-A Clojure library designed to ... well, that part is up to you.
+A Clojure library designed to execute functions that dependent upon
+the output of each other as specified by a DAG (directed acyclic
+graph).
 
 ## Usage
 
