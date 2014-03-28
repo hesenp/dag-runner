@@ -123,3 +123,77 @@
      (defn ~fname [x#] (+ temp# x#))))
 
 (cute-function haha)
+
+
+(defn get-args
+  "this function will be in charge of getting the corresponding
+  argument inputs from either the raw input hash-map (input-args) or
+  the intermediate output-args list."
+  [arg-list input-args output-args]
+  (apply merge 
+         (map
+          (fn [arg] (hash-map arg 
+                             (if (contains? input-args arg)
+                               (get arg input-args)
+                               (->> output-args
+                                    (filter #(= (:output-name %) arg))
+                                    first :value deref))))
+          arg-list)))
+
+(defmacro dag-run
+  "this function will execute a DAG of functions as specified by the
+  input. each node of the direct acyclic graph will consist of 1) a
+  function to run; 2) the input arguments to the function; 3) the
+  output of the function. dag-run will be able to automatically figure
+  out the interdependency between the functions and return a function
+  which takes the necessary input arguments and output a hashmap of
+  all the desired output. the input-dag should be a vector of
+  hashmaps. "
+  [fname input-dag]
+  `(let [input-args#  (mapcat :input ~input-dag)
+         output-args# (mapcat :output ~input-dag)
+         ]
+     ;; here we need to add a procedure to make sure that args
+     ;; contains all the keys needed for the program to run. also we
+     ;; need to verify that the program can run according to the
+     ;; present network structure.
+     (defn ~fname [& {:as args#}] 
+       (let [;; place holder to contain all the variable outputs. 
+             output-holder# (vec
+                             (map
+                              #(hash-map :output-name %
+                                         :value (promise))
+                              output-args#))
+             ;; place holder to contain all the function outputs.
+             fn-result-holder# (vec
+                                (map
+                                 #(hash-map :function (:function %)
+                                            :fun-output (promise))
+                                 ~input-dag))
+             
+             ]
+         (do
+           ;; deliver results to the output of each function
+           (map #(deliver (:fun-output %)
+                          ((:function %) (get-args (:input %)
+                                                   args#
+                                                   output-holder#)))
+                fn-result-holder#)
+           ;; pass the result of each function to the output
+           ;; variables.
+           
+           ;; output all variables.
+           
+           )
+         ))))
+
+
+(macroexpand (dag-run haha temp))
+
+
+(defn taket [& {:as temp}]
+  (+ (:x temp) (:y temp))
+  )
+
+
+(taket :x 1 :y 2)
