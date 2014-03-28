@@ -52,3 +52,74 @@
   )
 
 ;; ok, this trick will do the work. nice :) 
+
+(def a {:name "haha" :content (promise)})
+
+(deliver (:content a) "haha")
+
+(defmacro postfix-notation
+  [expression]
+  (conj (butlast expression) (last expression)))
+
+(postfix-notation (1 2 +))
+
+(defmacro critic
+  [{:keys [good bad]}]
+  (do (println "Great!"
+               (quote ~good))
+      (println "bad~"
+               (quote ~bad))))
+
+(defmacro run-add
+  [add other]
+  `(when ~add
+     1
+     ~other))
+
+(macroexpand (run-add true (+ 12)))
+
+(defmacro add-laughter
+  [execute]
+  (do (println "haha")
+      execute))
+
+(add-laughter (+ 1 2))
+
+(defn add-another
+  [execute]
+  (do (println "haha")
+      execute))
+
+(defmacro empty-func [fname & body]
+  `(defn ~fname []
+     ~@body))
+
+(defmacro empty-func [fname & body]
+  `(defn ~fname []
+     ~(if (= (first body) true)
+        ~@body
+        2
+        )))
+
+(macroexpand-1 '(empty-func haha (true)))
+
+(empty-func haha (true))
+
+(haha)
+
+(defmacro loud-function
+  [fname args & body]
+  (do `(defn ~fname [~args]
+         ~@body
+         )
+      (println "haha")
+      ))
+
+(macroexpand  (loud-function addone x (+ 1 x)))
+
+(defmacro cute-function
+  [fname]
+  `(let [temp# (rand)]
+     (defn ~fname [x#] (+ temp# x#))))
+
+(cute-function haha)
