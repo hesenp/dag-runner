@@ -52,3 +52,62 @@
   )
 
 ;; ok, this trick will do the work. nice :) 
+
+
+(defn haha [& {:as args}]
+  (println (:name args))
+  )
+
+(haha :name "hesen" :age 21)
+
+
+
+;; ok, we can refer to the same (promise) object from multiple places.
+;; like the example below. 
+(def a (promise))
+(def b {:x a :y a})
+(deliver a 12)
+b
+
+
+
+;; OK, we finally figured out how to write macros, let's have some
+;; macro fun here:
+
+
+
+(defmacro addd
+  [fname]
+  (let [input (rand)]
+    `(fn [x#] (+ x# ~input))))
+
+(macroexpand  (addd haha))
+
+(let [temp (addd haha)]
+  (temp 12))
+
+(def input
+  [{:function (fn [{:keys [a b]}]
+                {:x1 (+ a b) :x2 (- a b)})
+    :input [:a :b]
+    :output [:x1 :x2]
+    :id 1}
+   {:function (fn [{:keys [x1 y1]}]
+                {:z1 (* x1 y1)})
+    :input [:x1 :y1]
+    :output [:z1]
+    :id 2}
+   ]
+  )
+
+
+(defn dag-runner
+  "this will run"
+  [config]
+  (let [input-set (mapcat :input config)
+        output-set (map #({}) config)]
+    input-set)
+  )
+
+
+(dag-runner input)
