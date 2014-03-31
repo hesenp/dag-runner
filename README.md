@@ -4,7 +4,7 @@ A Clojure library designed to execute functions that dependent upon
 the output of each other as specified by a DAG (directed acyclic
 graph). 
 
-![](resources/example-dag-runner.svg?raw=true)
+![](resources/example-dag-runner.svg)
 
 ## Usage
 
