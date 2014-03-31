@@ -6,7 +6,7 @@ dag-runner do the (dirty) work of constructing the function execution
 flow.
 
 Yes, this is a Clojure library designed to execute functions that
-dependent upon the output of each other as specified by a DAG
+dependend upon the output of each other as specified by a DAG
 (directed acyclic graph).
 
 ![](images/example-dag-runner.png)
