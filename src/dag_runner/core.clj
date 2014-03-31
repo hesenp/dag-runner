@@ -1,16 +1,6 @@
 (ns dag-runner.core
   (:use [clojure.contrib.generic.functor :only [fmap]]))
 
-(def temp
-  [{:input [:x1 :x2]
-    :output [:y1 :y2]
-    :function (fn [{:keys [x1 x2]}]
-                {:y1 (+ x1 x2) :y2 (- x1 x2)})}
-   {:input [:y1 :z2]
-    :output [:w1 :w2]
-    :function (fn [{:keys [y1 z2]}]
-                {:w1 (* y1 z2) :w2 (+ y1 z2)})}])
-
 (defn aggregate-arguments
   "this function would aggregate all the inputs from either the
   function itself or a hash-map of promises. "
