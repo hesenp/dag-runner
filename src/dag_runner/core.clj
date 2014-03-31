@@ -25,6 +25,9 @@
                                      promise-arg))]
     (update-results result promise-arg)))
 
+;; ok. what's left is to aggregate all things together and make the
+;; whole thing happen.
+
 (defmacro dag-runner
   "this function will execute functions in a Directed Acyclic Graph as
   specified by their argument and output lists. "
