@@ -35,3 +35,26 @@
         (update-results result-list promise-arg)
         (is (= {:x 1 :y 2} (fmap deref promise-arg)))))))
 
+
+(def temp
+  [{:input [:x1 :x2]
+    :output [:y1 :y2]
+    :function (fn [{:keys [x1 x2]}]
+                {:y1 (+ x1 x2) :y2 (- x1 x2)})}
+   {:input [:y1 :z2]
+    :output [:w1 :w2]
+    :function (fn [{:keys [y1 z2]}]
+                {:w1 (* y1 z2) :w2 (+ y1 z2)})}])
+
+
+(deftest test-run-and-deliver-results
+  (testing "run the process for the corresponding function and deliver
+  results to the corresponding place."
+    (let [function-info {:function (fn [{:keys [x y]}] {:z (+ x y)})
+                         :input [:x :y]
+                         :output [:z]}
+          input-arg {:x 1 :y 2}
+          promise-arg {:z (promise)}]
+      (do
+        (run-and-deliver-results function-info input-arg promise-arg)
+        (is (= 3 (-> promise-arg :z deref)))))))
