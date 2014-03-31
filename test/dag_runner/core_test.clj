@@ -35,18 +35,6 @@
         (update-results result-list promise-arg)
         (is (= {:x 1 :y 2} (fmap deref promise-arg)))))))
 
-
-(def temp
-  [{:input [:x1 :x2]
-    :output [:y1 :y2]
-    :function (fn [{:keys [x1 x2]}]
-                {:y1 (+ x1 x2) :y2 (- x1 x2)})}
-   {:input [:y1 :z2]
-    :output [:w1 :w2]
-    :function (fn [{:keys [y1 z2]}]
-                {:w1 (* y1 z2) :w2 (+ y1 z2)})}])
-
-
 (deftest test-run-and-deliver-results
   (testing "run the process for the corresponding function and deliver
   results to the corresponding place."
@@ -58,3 +46,21 @@
       (do
         (run-and-deliver-results function-info input-arg promise-arg)
         (is (= 3 (-> promise-arg :z deref)))))))
+
+(deftest test-dagg-runner
+  (testing "this will test the core function of dag-runner and make
+  sure it works."
+    (let [temp [{:input [:x1 :x2]
+                 :output [:y1 :y2]
+                 :function (fn [{:keys [x1 x2]}]
+                             {:y1 (+ x1 x2) :y2 (- x1 x2)})}
+                {:input [:y1 :z2]
+                 :output [:w1 :w2]
+                 :function (fn [{:keys [y1 z2]}]
+                             {:w1 (* y1 z2) :w2 (+ y1 z2)})}]]
+      (do
+        ;; define a thing called runner according to specification
+        ;; from temp and have it run.
+        (dag-runner runner temp)
+        (let [result (runner :x1 1 :x2 2 :z2 3)]
+          (is (= result {:y2 -1 :w2 6 :w1 9})))))))
