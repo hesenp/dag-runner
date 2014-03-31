@@ -1,12 +1,13 @@
-# dag-runner
+# DAG-Runner
 
 A Clojure library designed to execute functions that dependent upon
 the output of each other as specified by a DAG (directed acyclic
-graph).
+graph). 
+
+![](resources/example-dag-runner.svg?raw=true)
 
 ## Usage
 
-FIXME
 
 ## License
 
