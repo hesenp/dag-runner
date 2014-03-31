@@ -54,6 +54,7 @@ generate the ultimate output (`:u :v`).
           {:function funC :input [:b :z] :output [:u :v]}])
 
 (aggregated-fun :x 1 :y 2 :a 3)
+;; {:u -9, :v -6}
 ```
 
 ## ToDo
