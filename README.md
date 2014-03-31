@@ -11,6 +11,23 @@ dependent upon the output of each other as specified by a DAG
 
 ![](images/example-dag-runner.png)
 
+## Installation 
+
+Leiningen coordinates: 
+```clj
+[dag-runner "0.1.0-SNAPSHOT"]
+``` 
+
+For Maven users: 
+
+``` xml 
+<dependency>
+  <groupId>dag-runner</groupId>
+  <artifactId>dag-runner</artifactId>
+  <version>0.1.0-SNAPSHOT</version>
+</dependency>
+```
+
 ## Usage
 
 First prepare a bunch of awesome functions. The input argument of each
@@ -48,6 +65,8 @@ flow (`:x :y :a`), automatically run through all functions above, and
 generate the ultimate output (`:u :v`).
 
 ```clj
+(use 'dag-runner.core)
+
 (dag-run aggregated-fun
          [{:function funA :input [:x :y] :output [:z :w]}
           {:function funB :input [:w :a] :output [:b]}
