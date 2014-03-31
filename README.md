@@ -20,7 +20,7 @@ should also be hash-maps. For example:
 Here we would like to run through three functions with to get the
 ultimate output. 
 
-```[clj]
+```clj
 (defn funA [{:keys [x y]}]
   {:z (+ x y)
    :w (- x y)})
@@ -60,12 +60,13 @@ generate the ultimate output (`:u :v`).
 
 * Add parser layer to directly take input and output key from function
   definitions. 
-
 * Add safeguard layer to make sure that the flow can finish.
 
 ## License
 
-Copyright © 2014 FIXME
+Copyright [Hesen Peng] [1] © 2014 
 
 Distributed under the Eclipse Public License either version 1.0 or (at
 your option) any later version.
+
+[1]: www.linkedin.com/in/hesenpeng/
