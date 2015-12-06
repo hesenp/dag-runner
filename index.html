@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="UTF-8">
+    <title>Dag-runner by hesenp</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+  </head>
+  <body>
+    <section class="page-header">
+      <h1 class="project-name">Dag-runner</h1>
+      <h2 class="project-tagline">Execute functions specified by a DAG (directed acyclic graph) </h2>
+      <a href="https://github.com/hesenp/dag-runner" class="btn">View on GitHub</a>
+      <a href="https://github.com/hesenp/dag-runner/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/hesenp/dag-runner/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
+
+    <section class="main-content">
+      <h1>
+<a id="dag-runner" class="anchor" href="#dag-runner" aria-hidden="true"><span class="octicon octicon-link"></span></a>DAG-Runner</h1>
+
+<p>Life is too short to be wasted on piping the output of one function
+into the other. Concentrate on writing (awesome) functions and let
+dag-runner do the (dirty) work of constructing the function execution
+flow.</p>
+
+<p>Yes, this is a Clojure library designed to execute functions that
+dependend upon the output of each other as specified by a DAG
+(directed acyclic graph).</p>
+
+<p><img src="images/example-dag-runner.png" alt=""></p>
+
+<h2>
+<a id="installation" class="anchor" href="#installation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Installation</h2>
+
+<p>Leiningen coordinates: </p>
+
+<div class="highlight highlight-source-clojure"><pre>[dag-runner <span class="pl-s"><span class="pl-pds">"</span>0.1.0-SNAPSHOT<span class="pl-pds">"</span></span>]</pre></div>
+
+<p>For Maven users: </p>
+
+<div class="highlight highlight-text-xml"><pre>&lt;<span class="pl-ent">dependency</span>&gt;
+  &lt;<span class="pl-ent">groupId</span>&gt;dag-runner&lt;/<span class="pl-ent">groupId</span>&gt;
+  &lt;<span class="pl-ent">artifactId</span>&gt;dag-runner&lt;/<span class="pl-ent">artifactId</span>&gt;
+  &lt;<span class="pl-ent">version</span>&gt;0.1.0-SNAPSHOT&lt;/<span class="pl-ent">version</span>&gt;
+&lt;/<span class="pl-ent">dependency</span>&gt;</pre></div>
+
+<h2>
+<a id="usage" class="anchor" href="#usage" aria-hidden="true"><span class="octicon octicon-link"></span></a>Usage</h2>
+
+<p>First prepare a bunch of awesome functions. The input argument of each
+function in the flow should be taking key-value pairs and the output
+should also be hash-maps. For example: </p>
+
+<p>Here we would like to run through three functions with to get the
+ultimate output. </p>
+
+<div class="highlight highlight-source-clojure"><pre>(<span class="pl-k">defn</span> <span class="pl-e">funA</span> [{<span class="pl-c1">:keys</span> [x y]}]
+  {<span class="pl-c1">:z</span> (<span class="pl-en">+</span> x y)
+   <span class="pl-c1">:w</span> (<span class="pl-en">-</span> x y)})
+
+(<span class="pl-k">defn</span> <span class="pl-e">funB</span>
+  <span class="pl-s"><span class="pl-pds">"</span>this function would take :w of the output from funA.<span class="pl-pds">"</span></span>
+  [{<span class="pl-c1">:keys</span> [w a]}]
+  {<span class="pl-c1">:b</span> (<span class="pl-en">*</span> w a)})
+
+(<span class="pl-k">defn</span> <span class="pl-e">funC</span>
+  <span class="pl-s"><span class="pl-pds">"</span>this function would take :z from funA and :b from funB and the</span>
+<span class="pl-s">  output :u :v are the ultimate output that we care about.<span class="pl-pds">"</span></span>
+  [{<span class="pl-c1">:keys</span> [b z]}]
+  {<span class="pl-c1">:u</span> (<span class="pl-en">*</span> b z)
+   <span class="pl-c1">:v</span> (<span class="pl-en">-</span> b z)}
+  )</pre></div>
+
+<p>The topology of the above function flow can be visualized as: </p>
+
+<p><img src="images/example-diagram.png" alt=""></p>
+
+<p>The function <code>dag-run</code> will create a super function <code>aggregated-fun</code>
+(or any name you like) that takes all necessary inputs for the above
+flow (<code>:x :y :a</code>), automatically run through all functions above, and
+generate the ultimate output (<code>:u :v</code>).</p>
+
+<div class="highlight highlight-source-clojure"><pre>(<span class="pl-k">use</span> 'dag-runner.core)
+
+(<span class="pl-en">dag-run</span> aggregated-fun
+         [{<span class="pl-c1">:function</span> funA <span class="pl-c1">:input</span> [<span class="pl-c1">:x</span> <span class="pl-c1">:y</span>] <span class="pl-c1">:output</span> [<span class="pl-c1">:z</span> <span class="pl-c1">:w</span>]}
+          {<span class="pl-c1">:function</span> funB <span class="pl-c1">:input</span> [<span class="pl-c1">:w</span> <span class="pl-c1">:a</span>] <span class="pl-c1">:output</span> [<span class="pl-c1">:b</span>]}
+          {<span class="pl-c1">:function</span> funC <span class="pl-c1">:input</span> [<span class="pl-c1">:b</span> <span class="pl-c1">:z</span>] <span class="pl-c1">:output</span> [<span class="pl-c1">:u</span> <span class="pl-c1">:v</span>]}])
+
+(<span class="pl-en">aggregated-fun</span> <span class="pl-c1">:x</span> <span class="pl-c1">1</span> <span class="pl-c1">:y</span> <span class="pl-c1">2</span> <span class="pl-c1">:a</span> <span class="pl-c1">3</span>)
+<span class="pl-c">;; {:u -9, :v -6}</span></pre></div>
+
+<h2>
+<a id="todo" class="anchor" href="#todo" aria-hidden="true"><span class="octicon octicon-link"></span></a>ToDo</h2>
+
+<ul>
+<li>Add parser layer to directly take input and output key from function
+definitions. </li>
+<li>Add safeguard layer to make sure that the flow can finish.</li>
+</ul>
+
+<h2>
+<a id="license" class="anchor" href="#license" aria-hidden="true"><span class="octicon octicon-link"></span></a>License</h2>
+
+<p>Copyright <a href="www.linkedin.com/in/hesenpeng/">Hesen Peng</a> © 2014 </p>
+
+<p>Distributed under the Eclipse Public License either version 1.0 or (at
+your option) any later version.</p>
+
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/hesenp/dag-runner">Dag-runner</a> is maintained by <a href="https://github.com/hesenp">hesenp</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+      </footer>
+
+    </section>
+
+  
+  </body>
+</html>
